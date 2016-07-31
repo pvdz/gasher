@@ -1,0 +1,59 @@
+<html>
+  <body>
+    <div>Show bitscan results on (generated) input code:</div>
+    <input id=B type="submit">
+    code: <input id=A style="width:500px;" value="(-1413107100/-x>>>0)%30">
+    <br>
+    bits: <input id="$flags" value="31" style="width:50px; text-align:center;"> (max 32)
+    <input type="checkbox" id="$inczero"> inc zero (none set)
+    <br>
+    max number of buckets: <input id="$buckets" value="31" style="width:50px; text-align:center;">
+    <br>
+    <textarea id=C style="width: 800px; height: 800px;" wrap="off"></textarea>
+    <script>
+      let t;
+      A.onkeyup = _ => (clearInterval(t),t=setTimeout(B.onclick, 1000));
+      B.onclick = _ => {
+        clearTimeout(t);
+
+        let func = Function('x', 'return '+A.value);
+
+        let outputToFlag = {};
+        let flagToOutput = [];
+        let actualOutputPerFlag = [];
+
+        let flags = new Array(parseInt($flags.value, 10)).fill(0).map((_,i) => 1 << i >>> 0);
+        if ($inczero.checked) flags.unshift(0);
+
+        flags.forEach((flag,i) => {
+          let result = func(flag);
+
+          if (flagToOutput[i]) flagToOutput[i] += ' ' + (result|0);
+          else flagToOutput[i] = (result | 0) + '';
+          if (outputToFlag[result | 0]) outputToFlag[result | 0] += ' ' + (!$inczero.checked?i:i?i-1:'--');
+          else outputToFlag[result | 0] =  (!$inczero.checked?i:i?i-1:'--') + '';
+          actualOutputPerFlag[flag] = result;
+        });
+
+        let arr = [];
+        for (let i = 0, n = flags.length; i < n; ++i) {
+          let output = func(flags[i]);
+          let a = (!$inczero.checked?i:i?i-1:'--')+': '+flagToOutput[i];
+          let b = i+': '+(outputToFlag[i]||'');
+          let c = 'f('+flags[i]+') = '+output;
+
+          arr.push(a + ' '.repeat(Math.max(1, 25-a.length) || 1) + b + ' '.repeat(Math.max(25- b.length, 1) || 1) + c);
+        }
+
+        C.value = ''+
+          'Code: '+ A.value+'\n\n'+
+          'Bits: '+$flags.value+' (max 32), also test no bits set: '+($inczero.checked?'yes':'no')+'\n'+
+          'Testing hash onto '+$buckets.value+' different buckets\n\n'+
+          'Bit flag to output       Output to bit flag       Actual input to actual output:\n\n' +
+          arr.join('\n')+
+          '';
+      };
+
+    </script>
+  </body>
+</html>

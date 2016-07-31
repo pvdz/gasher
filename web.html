@@ -1,0 +1,102 @@
+<html>
+<head>
+  <style>
+    .help { cursor: help; border-bottom: 1px dotted black; }
+    .help:hover { border-color: red; background-color: yellow; }
+    .bad { background-color: #ffce37; }
+  </style>
+</head>
+<body>
+  <div style="float: left; margin-right: 5px;">
+<img id=$spinner style=opacity:0; class=help title="this spinner indicates how busy the current browser thread is" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH+GkNyZWF0ZWQgd2l0aCBhamF4bG9hZC5pbmZvACH5BAAKAAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQACgABACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkEAAoAAgAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkEAAoAAwAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkEAAoABAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQACgAFACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQACgAGACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAAKAAcALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==">
+    <input style="width: 600px;" id=$valuestohash value="new Array(32).fill(0).map((_, i)=>1<<i>>>0).concat(0)"> <span class="help" title="Code should eval to an array with numbers, these will be the values to hash">values to hash</span><br>
+    (The above resulted in...) <input style="width: 500px;" id=$actualinputstohash disabled> len= <input style="width: 50px;" id=$actualinputlen disabled>
+    <hr>
+    <input style="width: 600px;" id=$values value="x, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0x1f"> <span class="help" title="allowed values to use by the fuzzer to construct tests">values</span><br>
+    <span class="help" title="integer weights, 1:1 to values. leave empty for random. otherwise missing weights are zero">weights</span>; <span class="help" title="weights of the last tested dna">current</span>: <input style="width: 300px;" id=$valuep> <span class="help" title="weights of the current best found dna">best</span>: <input style="width: 300px;" id=$valueb disabled><br>
+    <input style="width: 600px;" id=$prefixes  value="-, ~, !, ~~"> prefixes<br>
+    <span class="help" title="integer weights, 1:1 to values. leave empty for random. otherwise missing weights are zero">weights</span>; <span class="help" title="weights of the last tested dna">current</span>: <input style="width: 300px;" id=$prefixep> <span class="help" title="weights of the current best found dna">best</span>: <input style="width: 300px;" id=$prefixeb disabled><br>
+    <input style="width: 600px;" id=$infixes value="%, &, |, ^, <<, >>, >>>, *, +, -, /"> infixes<br>
+    <span class="help" title="integer weights, 1:1 to values. leave empty for random. otherwise missing weights are zero">weights</span>; <span class="help" title="weights of the last tested dna">current</span>: <input style="width: 300px;" id=$infixep> <span class="help" title="weights of the current best found dna">best</span>: <input style="width: 300px;" id=$infixeb disabled><br>
+    <hr>
+    <label><input type="radio" name=min value=1> <span class="help" title="weights can reach zero">all weights can be zero</span></label>
+    <label><input type="radio" name=min value=3 checked> <span class="help" title="weights cant reach zero">only some weights can be zero</span></label>
+    <label><input type="radio" name=min value=2> <span class="help" title="weights cant reach zero">no weight can be zero</span></label>
+    <hr>
+    <label><input type="radio" name=bound value=1 checked> <span class="help" title="all computations are used as is, no rounding/boxing">unbound</span></label>
+    <label><input type="radio" name=bound value=2> <span class="help" title="result of every operation is converted to 32bit signed">32bit signed</span></label>
+    <label><input type="radio" name=bound value=3> <span class="help" title="result of every operation is converted to 32bit unsigned">32bit unsigned</span></label>
+    <hr>
+    <label><input type="radio" name="clampmode" value=6 checked> <span class="help" title="apply all box modes per dna">all clamps</span></label>
+    <label><input type="radio" name="clampmode" value=0> <span class="help" title="one trial per dna, apply random bucket boxing">random clamp</span></label>
+    <label><input type="radio" name="clampmode" value=1> <span class="help" title="only apply this, dna result is unsigned modded with bucket size">(code >>> 0) % B</span></label>
+    <label><input type="radio" name="clampmode" value=2> <span class="help" title="only apply this, dna result is signed modded with bucket size">(code | 0) % B</span></label>
+    <label><input type="radio" name="clampmode" value=4> <span class="help" title="only apply this, dna result is ANDed with bucket size">code &amp; B</span></label>
+    <br>
+    <label><input type="radio" name="clampmode" value=3> <span class="help" title="only apply this, dna result is ABS, converted to 32bit, modded with bucket size">(Math.abs(code) | 0) % B</span></label>
+    <label><input type="radio" name="clampmode" value=5> <span class="help" title="only apply this, dna result is randomly shifted right, ANDed with bucket size">(code >> rng(B)) &amp; B</span></label>
+    <br>
+    <label><input type="radio" name="clampmode" value=7> <span class="help" title="only apply this custom clamping code, note that the result is still clamped to |0%B but if your clamping is proper you can remove that from the resulting code all the same (it prevents gasher from incorrect reports)">custom clamp</span>: before code: <input id=$clampbefore> after code: <input id=$clampafter></label>
+    <hr>
+    <span class="help" title="generates code from dna to test consisting of randomly up to this number of particles (always at least contains one x)">Particles</span>: <input style=width:50px; id=$parts value=15> <span class="help" title="how many buckets should we aim for? defaults to target value length (top input)">Buckets</span>: <input style=width:50px; id=$targetbucketcount> <span class="help" title="improved results replace the previous result until bucket size - this number, from there on out equal or better results are appended">Append</span>: <input style=width:50px; id=$appendafter value=2>
+    <hr>
+    <input type="button" class="help" id=$restartlast title="stop, then start over using the weights currently in the 'last' input fields as base dna, random if empty" value="restart from current">
+    <input type="button" class="help" id=$restartbest title="stop, then start over using the weights currently in the 'best' input fields as base dna, random if empty" value="restart from best">
+    <input type="button" class="help" id=$pause title="stop updating the ui until you continue it but dont stop the webworker" value="pause ui">
+    <input type="button" class="help" id=$rng title="randomize all weights" value="randomize weights">
+    <input type="button" class="help" id=$clear title="clear the inputs, causes next run to start with random values" value="clear current weights">
+    <br><br>
+    <input type="button" class="help" id=$toggle title="completely start/stop a runner" value="start">
+  </div>
+  <textarea id="A" style="width: 800px; height: 125px;"></textarea><br>
+  above: last of batch, always replaced<br>
+  below: best so far. equals are replaced until better than some score and appended otherwise<br>
+  <textarea id="B" style="width: 800px; height: 350px;"></textarea>
+  <br>
+
+  <pre id=C style="clear:both;"></pre>
+  <pre id=E></pre>
+  <pre id=$bucketcount class="help" title="this list shows stats on how many buckets each generated code per dna resulted in. it counts the results per how many different results all the values-to-hash created on a generated code. this will never be zero since there is always at least one bucket. counts under 100 are absolute with an x, otherwise % relative to the total number of codes generated with this dna. the end-goal for this hasher is to generate a code that takes all values-to-hash and for each such value outputs a unique number. that goal is the right-most bucket in this list."></pre>
+  <pre id=D></pre><br>
+
+  <script src="u.js"></script>
+  <script>
+    var compressor_options_defaults = {
+      sequences: true,
+      properties: true,
+      dead_code: true,
+      drop_debugger: true,
+      unsafe: true,
+      unsafe_comps: false,
+      conditionals: true,
+      comparisons: true,
+      evaluate: true,
+      booleans: true,
+      loops: true,
+      unused: true,
+      hoist_funs: true,
+      hoist_vars: false,
+      if_return: true,
+      join_vars: true,
+      cascade: true,
+      side_effects: true,
+      warnings: false,
+    };
+    function ujs2(code) {
+      // this is just a quick hack to get a working u2 in here, retrieved from the repl at http://lisperator.net/uglifyjs/#demo
+
+      var ast = UglifyJS.parse(code);
+      ast.figure_out_scope();
+      ast = ast.transform(UglifyJS.Compressor(compressor_options_defaults));
+      ast.figure_out_scope();
+      ast.compute_char_frequency();
+      ast.mangle_names();
+      var output = ast.print_to_string();
+      return output;
+    }
+    //console.log(ujs2('var foo = 15 + 39;'));
+  </script>
+
+  <script src="web.js"></script>
+</body>
+</html>

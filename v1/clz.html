@@ -1,0 +1,78 @@
+<html>
+<body>
+  <div style="float: left;">
+    <input style="width: 300px;" id=$values disabled> values<br>
+    <input style="width: 300px;" id=$valuep> last<br>
+    <input style="width: 300px;" id=$valueb> best<br>
+    <input style="width: 300px;" id=$prefixes disabled> prefixes<br>
+    <input style="width: 300px;" id=$prefixep> last<br>
+    <input style="width: 300px;" id=$prefixeb> best<br>
+    <input style="width: 300px;" id=$infixes disabled> infixes<br>
+    <input style="width: 300px;" id=$infixep> last<br>
+    <input style="width: 300px;" id=$infixeb> best<br>
+    <br>
+    <label><input type="radio" name=bound id=$unbound> unbound</label>
+    <label><input type="radio" name=bound id=$word> 32bit signed</label>
+    <label><input type="radio" name=bound id=$unsigned> 32bit unsigned</label>
+    <br>
+    <label><input type="radio" name="bucketmode" id="unsignedmod"> (code >>> 0) % B</label>
+    <label><input type="radio" name="bucketmode" id="signedmod"> (code | 0) % B</label>
+    <label><input type="radio" name="bucketmode" id="modabs"> (Math.abs(code) | 0) % B</label>
+    <label><input type="radio" name="bucketmode" id="and"> code &amp; 0x1f</label>
+    <label><input type="radio" name="bucketmode" id="rngand"> (code >> rng(B)) &amp; 0x1f</label>
+    <br><br>
+    <input type="button" id=$toggle value="pause">
+    <input type="button" id=$loadui value="load ui">
+    <input type="button" id=$best value="load best">
+    <input type="button" id=$rng value="randomize">
+    <br><br>
+    <textarea id="A" style="width: 800px; height: 200px;"></textarea>
+  </div>
+  <textarea id="B" style="width: 800px; height: 350px;"></textarea>
+  <br>
+<img src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH+GkNyZWF0ZWQgd2l0aCBhamF4bG9hZC5pbmZvACH5BAAKAAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQACgABACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkEAAoAAgAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkEAAoAAwAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkEAAoABAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQACgAFACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQACgAGACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAAKAAcALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==">
+  <pre id=C style="clear:both;"></pre>
+  <pre id=E></pre>
+  <pre>             bucket-count      1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  32</pre>
+  <pre id=D></pre><br>
+
+  <script src="u.js"></script>
+  <script>
+    var compressor_options_defaults = {
+      sequences: true,
+      properties: true,
+      dead_code: true,
+      drop_debugger: true,
+      unsafe: true,
+      unsafe_comps: false,
+      conditionals: true,
+      comparisons: true,
+      evaluate: true,
+      booleans: true,
+      loops: true,
+      unused: true,
+      hoist_funs: true,
+      hoist_vars: false,
+      if_return: true,
+      join_vars: true,
+      cascade: true,
+      side_effects: true,
+      warnings: false,
+    };
+    function ujs2(code) {
+      // this is just a quick hack to get a working u2 in here, retrieved from the repl at http://lisperator.net/uglifyjs/#demo
+
+      var ast = UglifyJS.parse(code);
+      ast.figure_out_scope();
+      ast = ast.transform(UglifyJS.Compressor(compressor_options_defaults));
+      ast.figure_out_scope();
+      ast.compute_char_frequency();
+      ast.mangle_names();
+      var output = ast.print_to_string();
+      return output;
+    }
+    //console.log(ujs2('var foo = 15 + 39;'));
+  </script>
+  <script src="clz.js"></script>
+</body>
+</html>
