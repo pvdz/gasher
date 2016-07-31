@@ -4,7 +4,7 @@ A hasher built on a fuzzer implemented as a genetic algorithm. You can use it to
 
 # Demo
 
-You can find a live demo at https://gasher.github.io/qfox/web.html
+You can find a live demo at https://qfox.github.io/gasher/web.html
 
 # UI
 
